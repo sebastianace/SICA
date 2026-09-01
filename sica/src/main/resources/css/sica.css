@@ -1,0 +1,290 @@
+/* ==========================================================================
+   SICA - tema visual
+   ==========================================================================
+
+   Direccion de diseno: consola de puesto de control nocturno.
+
+   El usuario real de esta pantalla es un guarda en una caseta, de pie, que
+   tiene que decidir en dos segundos si alguien entra o no. Todo el tema esta
+   subordinado a esa tarea:
+
+   - Fondo azul petroleo, no negro. El negro puro sobre monitores baratos
+     produce halos alrededor del texto claro y cansa en turnos largos.
+   - Ambar como color de interaccion. Sale del mundo del oficio: las luces de
+     talanquera y el sodio de las lamparas de porteria. Deja libres el verde y
+     el rojo para lo unico que importa de verdad.
+   - Verde, ambar y rojo NO son decoracion: son el semaforo de la talanquera.
+     Ningun otro elemento de la interfaz puede usarlos.
+   - Monoespaciada para documentos, horas e identificadores. Son datos que se
+     leen digito por digito y se comparan contra una cedula fisica.
+
+   Elemento distintivo: la franja de veredicto. Una banda a todo el ancho que
+   se inunda del color del semaforo y muestra UNA palabra en tamano enorme.
+   Es lo unico ruidoso de la pantalla. Todo lo demas se mantiene callado.
+   ========================================================================== */
+
+.root {
+    /* Superficies */
+    -acero-950: #0B141B;
+    -acero-900: #0E1A22;
+    -acero-800: #14242E;
+    -acero-700: #1E3542;
+    -acero-600: #2B4757;
+
+    /* Tipografia */
+    -marfil:    #E6EDF1;
+    -niebla:    #8FA5B2;
+    -niebla-op: #5E7482;
+
+    /* Interaccion */
+    -ambar:     #F0A202;
+    -ambar-sub: #C48302;
+
+    /* Semaforo de talanquera */
+    -verde:     #35C46E;
+    -rojo:      #E8455F;
+    -neutro:    #6B8494;
+
+    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Inter", sans-serif;
+    -fx-background-color: -acero-900;
+    -fx-text-fill: -marfil;
+}
+
+.mono {
+    -fx-font-family: "JetBrains Mono", "Cascadia Mono", "Consolas", "Menlo", "DejaVu Sans Mono", monospace;
+}
+
+/* ---------------------------------------------------------------- textos -- */
+.titulo        { -fx-font-size: 26px; -fx-font-weight: 700; -fx-text-fill: -marfil; }
+.subtitulo     { -fx-font-size: 15px; -fx-font-weight: 600; -fx-text-fill: -marfil; }
+.cuerpo        { -fx-font-size: 13px; -fx-text-fill: -marfil; }
+.apagado       { -fx-font-size: 12px; -fx-text-fill: -niebla; }
+.microtexto    { -fx-font-size: 10.5px; -fx-text-fill: -niebla-op; }
+
+/* Los rotulos de seccion se escriben en mayusculas desde Java. Aqui solo se
+   les baja el peso visual para que ordenen sin competir con el contenido. */
+.rotulo {
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -niebla-op;
+}
+
+/* ------------------------------------------------------------ superficies -- */
+.panel {
+    -fx-background-color: -acero-800;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: -acero-700;
+    -fx-border-width: 1;
+}
+
+.panel-hundido {
+    -fx-background-color: -acero-950;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: -acero-700;
+    -fx-border-width: 1;
+}
+
+.barra-superior {
+    -fx-background-color: -acero-950;
+    -fx-border-color: transparent transparent -acero-700 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Panel de identidad del login. La linea ambar de la izquierda es el unico
+   adorno de toda la pantalla. */
+.panel-marca {
+    -fx-background-color: -acero-950;
+    -fx-border-color: transparent -ambar transparent transparent;
+    -fx-border-width: 0 3 0 0;
+}
+
+/* --------------------------------------------------------------- campos --- */
+.text-field, .password-field, .combo-box, .text-area {
+    -fx-background-color: -acero-950;
+    -fx-text-fill: -marfil;
+    -fx-prompt-text-fill: -niebla-op;
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-border-color: -acero-600;
+    -fx-border-width: 1;
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .text-area:focused {
+    -fx-border-color: -ambar;
+    -fx-border-width: 1.5;
+}
+
+/* Campo del documento: es lo que mas se teclea en toda la jornada. */
+.campo-documento {
+    -fx-font-family: "JetBrains Mono", "Cascadia Mono", "Consolas", "Menlo", monospace;
+    -fx-font-size: 20px;
+    -fx-padding: 12 14 12 14;
+}
+
+.combo-box .list-cell        { -fx-text-fill: -marfil; -fx-background-color: transparent; }
+.combo-box-popup .list-view  { -fx-background-color: -acero-800; -fx-border-color: -acero-600; }
+.combo-box-popup .list-cell:filled:hover { -fx-background-color: -acero-700; }
+
+/* --------------------------------------------------------------- botones -- */
+.button {
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-padding: 10 18 10 18;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.boton-primario {
+    -fx-background-color: -ambar;
+    -fx-text-fill: -acero-950;
+}
+.boton-primario:hover   { -fx-background-color: derive(-ambar, 12%); }
+.boton-primario:pressed { -fx-background-color: -ambar-sub; }
+
+.boton-secundario {
+    -fx-background-color: transparent;
+    -fx-text-fill: -marfil;
+    -fx-border-color: -acero-600;
+    -fx-border-width: 1;
+}
+.boton-secundario:hover { -fx-background-color: -acero-700; }
+
+.boton-ingreso {
+    -fx-background-color: -verde;
+    -fx-text-fill: #062313;
+    -fx-font-size: 14px;
+    -fx-padding: 13 22 13 22;
+}
+.boton-ingreso:hover { -fx-background-color: derive(-verde, 10%); }
+
+.boton-salida {
+    -fx-background-color: transparent;
+    -fx-text-fill: -niebla;
+    -fx-border-color: -acero-600;
+    -fx-border-width: 1;
+}
+.boton-salida:hover { -fx-background-color: -acero-700; -fx-text-fill: -marfil; }
+
+.button:disabled { -fx-opacity: 0.35; -fx-cursor: default; }
+
+.boton-plano {
+    -fx-background-color: transparent;
+    -fx-text-fill: -niebla;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 12px;
+}
+.boton-plano:hover { -fx-text-fill: -ambar; }
+
+/* ============================================================================
+   FRANJA DE VEREDICTO - el elemento distintivo de la interfaz
+   ============================================================================
+   Una sola palabra, a todo el ancho, en el color del semaforo. Legible desde
+   el otro extremo de la caseta. La barra vertical del borde izquierdo repite
+   el color para que la senal siga siendo visible aunque el monitor este mal
+   calibrado o el guarda tenga daltonismo: el grosor y la posicion tambien
+   comunican, no solo el tono. */
+
+.franja-veredicto {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-width: 0 0 0 6;
+    -fx-padding: 20 26 20 22;
+}
+
+.palabra-veredicto {
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
+}
+
+.instruccion-veredicto {
+    -fx-font-size: 13px;
+    -fx-text-fill: -marfil;
+    -fx-opacity: 0.85;
+}
+
+.veredicto-verde  { -fx-background-color: rgba(53,196,110,0.13);  -fx-border-color: -verde; }
+.veredicto-ambar  { -fx-background-color: rgba(240,162,2,0.13);   -fx-border-color: -ambar; }
+.veredicto-rojo   { -fx-background-color: rgba(232,69,95,0.13);   -fx-border-color: -rojo; }
+.veredicto-neutro { -fx-background-color: rgba(107,132,148,0.10); -fx-border-color: -neutro; }
+.veredicto-vacio  { -fx-background-color: -acero-950;             -fx-border-color: -acero-700; }
+
+.texto-verde  { -fx-text-fill: -verde; }
+.texto-ambar  { -fx-text-fill: -ambar; }
+.texto-rojo   { -fx-text-fill: -rojo; }
+.texto-neutro { -fx-text-fill: -neutro; }
+
+/* --------------------------------------------------------------- avisos --- */
+.aviso {
+    -fx-background-radius: 7;
+    -fx-border-radius: 7;
+    -fx-border-width: 0 0 0 3;
+    -fx-padding: 11 14 11 12;
+    -fx-font-size: 12.5px;
+}
+.aviso-exito       { -fx-background-color: rgba(53,196,110,0.10); -fx-border-color: -verde; -fx-text-fill: -marfil; }
+.aviso-error       { -fx-background-color: rgba(232,69,95,0.10);  -fx-border-color: -rojo;  -fx-text-fill: -marfil; }
+.aviso-advertencia { -fx-background-color: rgba(240,162,2,0.10);  -fx-border-color: -ambar; -fx-text-fill: -marfil; }
+
+/* ------------------------------------------------------------- etiquetas -- */
+.insignia {
+    -fx-background-radius: 4;
+    -fx-padding: 3 9 3 9;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+}
+.insignia-rol     { -fx-background-color: -acero-700; -fx-text-fill: -ambar; }
+.insignia-neutra  { -fx-background-color: -acero-700; -fx-text-fill: -niebla; }
+.insignia-alerta  { -fx-background-color: rgba(232,69,95,0.18); -fx-text-fill: -rojo; }
+
+/* ---------------------------------------------------------------- fotos --- */
+.marco-foto {
+    -fx-background-color: -acero-950;
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+    -fx-border-color: -acero-600;
+    -fx-border-width: 1;
+}
+
+/* ---------------------------------------------------------------- tabla --- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -acero-700;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.table-view .column-header-background { -fx-background-color: -acero-950; }
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -acero-700 transparent;
+    -fx-size: 34;
+}
+.table-view .column-header .label {
+    -fx-text-fill: -niebla-op;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-alignment: center-left;
+}
+.table-row-cell {
+    -fx-background-color: -acero-800;
+    -fx-border-color: transparent transparent -acero-700 transparent;
+    -fx-table-cell-border-color: transparent;
+}
+.table-row-cell:odd      { -fx-background-color: derive(-acero-800, 2%); }
+.table-row-cell:selected { -fx-background-color: -acero-700; }
+.table-view .table-cell  { -fx-text-fill: -marfil; -fx-font-size: 12px; -fx-padding: 9 10 9 10; }
+.table-view .placeholder .label { -fx-text-fill: -niebla-op; }
+
+/* --------------------------------------------------------- desplazamiento - */
+.scroll-pane, .scroll-pane .viewport { -fx-background-color: transparent; }
+.scroll-bar { -fx-background-color: transparent; }
+.scroll-bar .thumb { -fx-background-color: -acero-600; -fx-background-radius: 4; }
+.scroll-bar .thumb:hover { -fx-background-color: -niebla-op; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-opacity: 0; -fx-padding: 0; }
+
+/* ----------------------------------------------------------- separadores -- */
+.separator .line { -fx-border-color: -acero-700; -fx-border-width: 1 0 0 0; }
