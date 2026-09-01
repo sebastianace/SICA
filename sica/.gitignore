@@ -1,0 +1,24 @@
+# Compilados y empaquetado
+target/
+*.class
+*.jar
+
+# Configuracion local con credenciales. NUNCA se versiona.
+src/main/resources/config.properties
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+nbproject/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Exportaciones generadas en tiempo de ejecucion
+exportaciones/
+*.log
