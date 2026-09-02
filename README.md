@@ -43,29 +43,91 @@ para una evacuacion.
 
 ## 3. Arquitectura
 
-### Nota sobre MVC
-
-El enunciado presenta una contradiccion: la seccion de requisitos exige
-**"Arquitectura Hexagonal aplicando vertical Slice"**, mientras que la de
-entregables pide el codigo *"estructurado en paquetes segun la arquitectura
-MVC"*. Son dos criterios de organizacion distintos y no se pueden satisfacer
-literalmente los dos a la vez.
-
-Se consulto con el docente y se confirmo que **prevalece la arquitectura
-hexagonal**. El proyecto se estructura en consecuencia.
-
-Vale la pena notar que no se pierde nada de lo que MVC busca: la separacion
-entre presentacion, logica y datos sigue existiendo, y de hecho es mas estricta.
-El paquete `ui` cumple el papel de la vista, los casos de uso en `aplicacion`
-el del controlador, y el `dominio` concentra el modelo. La diferencia es que
-aqui la dependencia va en una sola direccion y esta verificada: el dominio no
-importa nada de infraestructura ni de la interfaz.
-
+**Hexagonal (puertos y adaptadores) con organizacion en vertical slice.**
+ 
+La idea central es una sola: **las dependencias apuntan siempre hacia adentro.**
+El nucleo de negocio no sabe que existe MySQL, ni JavaFX, ni JDBC. Sabe que
+existe *algo* que guarda visitas, y lo declara como una interfaz. Quien la
+implementa es asunto de la periferia.
+ 
+### Las tres capas
+ 
+| Capa | Que contiene | De que NO puede depender |
+|---|---|---|
+| `dominio` | Reglas de negocio puras: `Visita`, `EstadoVisita`, `Veredicto` | De nada. Solo Java estandar. |
+| `aplicacion` | Casos de uso y **puertos** (interfaces) | De infraestructura ni de la interfaz grafica |
+| `infraestructura` | **Adaptadores**: JDBC, bus de eventos | Depende hacia adentro, nunca al reves |
+ 
+Fuera de esas tres estan `ui` (adaptador de entrada, JavaFX) y `arranque`
+(la raiz de composicion, donde se conecta todo).
+ 
+### Puertos y adaptadores
+ 
+Un **puerto** es una interfaz que la capa de aplicacion declara con lo que
+necesita. Un **adaptador** es la implementacion concreta que vive afuera.
+ 
+```
+RegistrarIngresoService  ──depende de──>  RepositorioVisitas   (puerto, interfaz)
+                                                  ▲
+                                                  │ implementa
+                                          JdbcRepositorioVisitas (adaptador)
+```
+ 
+El caso de uso nunca nombra a `JdbcRepositorioVisitas`. Recibe un
+`RepositorioVisitas` por constructor y no sabe si detras hay MySQL, un archivo
+o una lista en memoria.
+ 
+El proyecto tiene **10 puertos** y **10 adaptadores** (9 de JDBC y el bus de
+eventos en memoria).
+ 
+### La raiz de composicion
+ 
+Los adaptadores se instancian en **un solo lugar**: `ContextoAplicacion`. Es lo
+que hace posible que el resto del codigo dependa solo de interfaces. Ningun
+servicio ni ninguna pantalla hace `new JdbcRepositorioVisitas()`.
+ 
+### Como se verifica que la regla se cumple
+ 
+No hace falta creer en la palabra: se puede comprobar. Estos cuatro comandos
+recorren el codigo fuente buscando violaciones de la regla de dependencia.
+ 
+```bash
+# 1. El dominio no puede conocer JDBC, JavaFX ni infraestructura
+grep -rn "^import" --include=*.java */dominio/ | grep -E "java.sql|javafx|infraestructura"
+ 
+# 2. La capa de aplicacion tampoco
+grep -rn "^import" --include=*.java */aplicacion/ | grep -E "java.sql|javafx"
+ 
+# 3. JDBC solo puede vivir en los adaptadores
+grep -rln "import java.sql" --include=*.java . | grep -v infraestructura
+ 
+# 4. Ningun caso de uso instancia un adaptador
+grep -rn "new Jdbc" --include=*.java */aplicacion/ ui/
+```
+ 
+**Los cuatro devuelven vacio.** Esa es la definicion operativa de "es
+hexagonal": no que el codigo este en carpetas con esos nombres, sino que las
+flechas de dependencia solo apunten hacia adentro.
+ 
+La unica excepcion aparente es `Main.java`, que importa JavaFX porque extiende
+`Application`. Es el punto de entrada del programa y su trabajo es precisamente
+arrancar el adaptador de interfaz; no es una violacion de la regla.
+ 
+### Vertical slice
+ 
+Dentro de esa arquitectura, el codigo se organiza **primero por capacidad de
+negocio y despues por capa**. En vez de un paquete `repositorios` con todos los
+repositorios juntos, hay un paquete `acceso` que contiene su propio dominio,
+sus puertos y sus adaptadores.
+ 
+La ventaja practica: para cambiar como funciona la porteria, todo lo que hay que
+tocar esta en una carpeta.
+ 
 ### Estructura
-
+ 
 **Hexagonal + vertical slice.** El codigo se organiza primero por capacidad de
 negocio, y dentro de cada capacidad por capa:
-
+ 
 ```
 com.zonaacme.sica
 ├── acceso/              <- slice: porteria y visitas
@@ -87,12 +149,12 @@ com.zonaacme.sica
 ├── arranque/            <- raiz de composicion (ContextoAplicacion, Main)
 └── ui/                  <- adaptadores de entrada JavaFX
 ```
-
+ 
 **La regla de dependencia:** `dominio` no importa nada de `infraestructura` ni de
 `ui`. Las flechas apuntan siempre hacia adentro. `aplicacion` define interfaces
 (`RepositorioVisitas`, `Bitacora`, `PublicadorEventos`) y `infraestructura` las
 implementa.
-
+ 
 Para no romper esa regla en las transacciones existe `ContextoTransaccion`, una
 interfaz marcadora vacia que viaja por las firmas de los puertos. Asi la capa de
 aplicacion coordina transacciones **sin importar nunca `java.sql.Connection`**.
@@ -387,14 +449,4 @@ Commits siguiendo **Conventional Commits** (`feat:`, `fix:`, `docs:`, `refactor:
 
 ---
 
-## 12. Roadmap v2
 
-Fuera del alcance por tiempo, pero con el diseno preparado:
-
-- **Codigos QR** para el carnet, con ZXing.
-- **Motor de reportes** con exportacion a PDF.
-- **Pruebas automatizadas** con JUnit 5, y ArchUnit para que la regla de
-  dependencia se verifique sola en cada commit.
-- **Bus de eventos distribuido**: el dominio solo conoce el puerto
-  `PublicadorEventos`. Si manana esto corre en tres garitas, se escribe un
-  adaptador de sockets y el dominio no se toca.
