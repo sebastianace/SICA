@@ -209,9 +209,9 @@ Notificar algo que despues hace rollback deja la interfaz mintiendo.
 
 ## 5. SOLID en decisiones concretas
 
-- **S** — `RegistrarIngresoService` solo coordina el ingreso. Permisos y bitacora viven en decoradores aparte.
+- **S** — `RegistrarIngresoService` solo coordina el ingreso. Permisos y bitacora viven en decoradores aparte. linea 35
 - **O** — Agregar auditoria a un caso de uso no obliga a modificar el servicio: se envuelve.
-- **L** — Todos los casos de uso implementan `CasoDeUso<E,S>` y son intercambiables; los decoradores tambien lo implementan.
+- **L** — Todos los casos de uso implementan `CasoDeUso<E,S>` y son intercambiables; los decoradores tambien lo implementan. quien recibe un caso de uso no sabe ni le importa si le llego un serviciio pelado o envuelto dos veces. linea 21 y 24
 - **I** — Puertos pequenos y por slice. `ConsultaPorteria` y `RepositorioVisitas` estan separados porque uno es lectura de porteria y el otro escritura de visitas.
 - **D** — `RegistrarIngresoService` depende de la interfaz `RepositorioVisitas`, no de `JdbcRepositorioVisitas`. El cableado ocurre solo en `ContextoAplicacion`.
 
@@ -223,7 +223,7 @@ Notificar algo que despues hace rollback deja la interfaz mintiendo.
 los decoradores envuelvan cualquier caso de uso sin escribir uno por operacion.
 Las descripciones de auditoria se declaran como lambdas en la raiz de
 composicion, de modo que cada caso de uso decide que contar sin que el decorador
-tenga que conocerlo.
+tenga que conocerlo. " contextoAplicacion.java linea 33 y 62 "
 
 **Stream API.** El modulo de reportes esta construido sobre streams, y la
 eleccion tiene una razon concreta: sobre el **mismo** conjunto de filas se
@@ -231,7 +231,7 @@ calculan seis cortes distintos (por empresa, por tipo, por estado, por hora,
 promedio de estancia, top de estancias largas). Resolverlos con `GROUP BY` seria
 seis consultas sobre exactamente los mismos datos. Se trae el detalle una vez
 —filtrado e indexado por SQL, que es lo que SQL hace bien— y se agrega en
-memoria.
+memoria. "GenerarReportesVisitasService.java" linea 71
 
 Colectores en uso: `groupingBy`, `counting`, `averagingLong`, `toMap`,
 `joining`, ademas de `flatMap`, `sorted` y `limit`.
@@ -440,7 +440,16 @@ La bitacora arranca **vacia a proposito**: debe llenarse desde Java, no desde el
 
 ---
 
-## 11. Git Flow
+## 11. hilos
+
+el pool del bus de eventos BusEventosEnMemoria, ln35
+quien publica un evento no se quede esperando a que todos los suscriptores terminen y para que no impidan cerrar la aplicacion
+
+ventanalogin.java ln202
+El login verifica un hash de 120.000 iteraciones pero tarda mucho tiempo y sumado el viaje a la base de datos hacerlo en el hilo de javafx congelaria la ventana en cada intento.
+
+
+## 12. Git Flow
 
 `main` (produccion) y `develop` (integracion), con ramas `feature/*` que se
 integran con `--no-ff` para que el grafo conserve la forma del flujo.
@@ -450,3 +459,28 @@ Commits siguiendo **Conventional Commits** (`feat:`, `fix:`, `docs:`, `refactor:
 ---
 
 
+## 13. config.properties
+
+db.url=jdbc:mysql://localhost:3307/sica?serverTimezone=America/Bogota&useSSL=false&allowPublicKeyRetrieval=true
+db.usuario=campus
+db.password=campus123
+app.terminal=UNIVERSIDAD
+
+## 14. 1.Abrir una terminal en la carpeta donde está pom.xml y ejecutar:
+
+docker compose down -v
+docker compose up -d
+
+Revisar que este creada
+docker compose ps
+docker compose logs mysql
+
+Confirmar que sí existen las tablas
+
+Ejecutar:
+
+docker compose exec mysql mysql -ucampus -pcampus123 -e "USE sica; SHOW TABLES;"
+
+2.Iniciar la aplicación
+Desde la carpeta donde está pom.xml:
+mvn clean javafx:run
